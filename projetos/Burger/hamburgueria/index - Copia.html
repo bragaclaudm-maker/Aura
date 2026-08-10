@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>BURGER PRO - Pinned Organic Cheddar Melt Edition</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- SF Pro Font (Apple Style) -->
+    <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            touch-action: manipulation;
+        }
+
+        /* 🌌 CANVAS ANTIGRAVITY PARTICLES */
+        #antigravity-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100dvh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 🚀 PALCO DE ANIMAÇÃO 3D REAL COM PERSPECTIVA DE PROFUNDIDADE */
+        #explosion-stage {
+            perspective: 1400px;
+            perspective-origin: 50% 50%;
+            transform-style: preserve-3d;
+            height: 100dvh;
+        }
+
+        /* Container fixado (pinned) pelo GSAP no centro exato da tela */
+        .burger-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 90vw;
+            max-width: 900px;
+            aspect-ratio: 1 / 1;
+            z-index: 10;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        @media (max-width: 768px) {
+            .burger-container {
+                width: 90vw;
+                max-width: 360px;
+            }
+        }
+
+        /* Camadas individuais do hambúrguer - Animações gerenciadas 100% via GSAP */
+        .burger-layer {
+            position: absolute;
+            object-fit: contain;
+            left: 50%;
+            top: 50%;
+            will-change: transform, opacity, filter;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        /* Halo Minimalista Monocromático (Branco & Prata) */
+        .hover-amber-halo {
+            position: fixed;
+            top: 50%;
+            left: 22%;
+            transform: translate(-50%, -50%);
+            width: 750px;
+            height: 750px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, rgba(180, 180, 200, 0.06) 45%, rgba(0, 0, 0, 0) 70%);
+            pointer-events: none;
+            z-index: 5;
+            filter: blur(60px);
+            will-change: transform, opacity;
+        }
+
+        @media (max-width: 768px) {
+            .hover-amber-halo {
+                left: 50%;
+                width: 80vw;
+                height: 80vw;
+            }
+        }
+
+        /* Minimalist Glass Card Styling (Responsive Desktop & Mobile Bottom Sheet) */
+        .apple-minimal-card {
+            background: rgba(12, 12, 16, 0.94);
+            backdrop-filter: blur(35px);
+            -webkit-backdrop-filter: blur(35px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95);
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-white selection:text-black">
+
+    <!-- 🌌 CANVAS INTERATIVO DE PARTÍCULAS MINIMALISTAS -->
+    <canvas id="antigravity-canvas"></canvas>
+
+    <!-- Navbar Minimalista Responsiva -->
+    <header class="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-xl border-b border-white/5 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex justify-between items-center">
+            <div class="text-base sm:text-lg font-semibold tracking-widest text-white flex items-center gap-2 uppercase">
+                BURGER<span class="text-gray-400 font-bold">PRO</span>
+            </div>
+            <nav class="hidden sm:flex gap-8 text-xs font-medium tracking-wider uppercase text-gray-400">
+                <a href="#hero" class="hover:text-white transition-colors">Visão Geral</a>
+                <a href="#explosion-stage" class="hover:text-white transition-colors">Especificações 3D</a>
+                <a href="#proxima-secao" class="hover:text-white transition-colors">Cheddar Melt</a>
+                <a href="#sec-cardapio" class="hover:text-white transition-colors">Cardápio</a>
+            </nav>
+            <button class="border border-white/20 text-white hover:bg-white hover:text-black px-4 sm:px-6 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-medium tracking-wider uppercase transition-all duration-300">
+                Pedir Agora
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="min-h-[100dvh] w-full flex flex-col items-center justify-center text-center relative z-10 px-6 pt-16">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/10 text-gray-300 text-[10px] sm:text-xs font-medium tracking-widest uppercase mb-6 bg-white/5 backdrop-blur-md">
+            ✨ Minimalist Mobile & Desktop Design
+        </div>
+        <h1 class="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tighter mb-4 sm:mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white via-gray-200 to-gray-600 max-w-4xl leading-tight">
+            Engenharia do Sabor.
+        </h1>
+        <p class="text-base sm:text-xl md:text-2xl text-gray-400 font-normal tracking-tight max-w-xl">
+            Cada ingrediente projetado para a mordida perfeita.
+        </p>
+
+        <!-- Ícone de rolagem para baixo -->
+        <div class="absolute bottom-8 sm:bottom-10 animate-bounce text-gray-500 flex flex-col items-center gap-2">
+            <span class="text-[9px] sm:text-[10px] uppercase tracking-widest font-semibold text-gray-500">Role para ver a entrada lateral</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Explosion Stage (Horizontal Canvas Animation + 3D Background Parallax) -->
+    <section id="explosion-stage" class="relative w-full h-[100dvh] overflow-hidden">
+
+        <!-- Halo minimalista monocromático atrás do Item em Foco -->
+        <div id="hover-halo" class="hover-amber-halo opacity-0 scale-75"></div>
+
+        <div class="burger-container" id="burger-container">
+
+            <!-- Camadas Gastronômicas com Data Attributes -->
+            <!-- Base (Camada 7) -->
+            <img src="pao de baixo.png" alt="Pão Baixo" class="burger-layer" id="layer-bottom-bun"
+                style="z-index: 10; width: 80%;" data-category="Estrutura Base" data-title="Base do Pão Tostada"
+                data-what="Base firme e macia projetada para suportar todo o peso dos ingredientes com máxima estabilidade."
+                data-how="Tostada com camada dupla de manteiga de ervas para criar uma barreira impermeável antiumidade, mantendo a estrutura impecável até o último pedaço.">
+
+            <!-- Alface Baixo (Camada 6) -->
+            <img src="alface baixo.png" alt="Alface Baixo" class="burger-layer" id="layer-bottom-lettuce"
+                style="z-index: 20; width: 85%;" data-category="Base Crocante" data-title="Cama de Alface Julienne"
+                data-what="Base folhosa fresca cortada delicadamente em tiras para retenção uniforme dos molhos."
+                data-how="Cortada em tiras finas e temperada com redução artesanal de balsâmico e azeite extravirgem para capturar os sucos preciosos da carne.">
+
+            <!-- Carne (Camada 5) -->
+            <img src="carne.png" alt="Carne Angus" class="burger-layer" id="layer-meat" style="z-index: 30; width: 80%;"
+                data-category="Carne Nobre" data-title="Blend Angus 180g"
+                data-what="Hambúrguer artesanal de altíssima suculência com crosta caramelizada rica em umami."
+                data-how="Moagem diária de 60% Picanha e 40% Costela Angus. Grelhado em pedras vulcânicas a alta temperatura (Reação de Maillard) para aprisionar o suco.">
+
+            <!-- Queijo (Camada 4) -->
+            <img src="queijo.png" alt="Queijo Cheddar" class="burger-layer" id="layer-cheese"
+                style="z-index: 40; width: 75%;" data-category="Queijo Legítimo" data-title="Cheddar Melt Defumado"
+                data-what="Queijo cheddar inglês legítimo de sabor cremoso, intenso e textura aveludada."
+                data-how="Envelhecido por 12 meses, derretido no vapor de cerveja IPA e defumado lentamente com lenha natural de macieira.">
+
+            <!-- Tomate (Camada 3) -->
+            <img src="tomate.png" alt="Tomate" class="burger-layer" id="layer-tomato" style="z-index: 50; width: 70%;"
+                data-category="Horta Selecionada" data-title="Tomate Caipira Confitado"
+                data-what="Fatia carnuda de tomate vermelho caipira riquíssimo em açúcares e acidez equilibrada."
+                data-how="Marinado em azeite trufado com flor de sal e levemente tostado no maçarico para selar os açúcares e acentuar o sabor natural.">
+
+            <!-- Topo (Camada 1) -->
+            <img src="pao de cima.png" alt="Pão Topo" class="burger-layer" id="layer-top-bun"
+                style="z-index: 60; width: 78%;" data-category="Topo do Lanche" data-title="Pão Brioche de Ouro"
+                data-what="Pão estilo brioche levemente adocicado com gergelim orgânico e miolo aerado."
+                data-how="Fermentado por 24h artesanalmente, pincelado com gema orgânica e manteiga clarificada, selado na chapa a 200°C para isolamento perfeito.">
+
+            <!-- Alface Topo (Camada 2 - Acima do Pão Topo) -->
+            <img src="alface topo.png" alt="Alface Topo" class="burger-layer" id="layer-top-lettuce"
+                style="z-index: 70; width: 82%;" data-category="Folhas Frescas" data-title="Salada Hydroponic Crocante"
+                data-what="Alface crespa hidropônica cultivada em ambiente sustentável livre de agrotóxicos."
+                data-how="Colhida poucas horas antes do preparo, higienizada em água ozonizada e resfriada a 4°C para garantir o barulho da crocância perfeita.">
+
+            <!-- HAMBÚRGUER COMPLETO INTACTO -->
+            <img id="layer-full-burger" src="hamburguer completo.png" class="burger-layer pointer-events-none"
+                style="z-index: 80; width: 82%;" alt="Hambúrguer Completo" />
+
+        </div>
+
+        <!-- 🚀 ABA DE ESPECIFICAÇÕES EXPANDIDA (DESKTOP CARD & MOBILE BOTTOM SHEET) -->
+        <div id="hover-detail-card"
+            class="fixed z-50 pointer-events-none opacity-0 scale-95 transition-all duration-450
+                   top-1/2 right-[4%] md:right-[6%] -translate-y-1/2 max-md:top-auto max-md:bottom-4 max-md:left-1/2 max-md:-translate-x-1/2 max-md:right-auto max-md:translate-y-0">
+            <div class="apple-minimal-card rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl w-[92vw] max-w-lg md:w-[540px] relative">
+                
+                <!-- Botão de Fechar no Mobile (Tátil) -->
+                <button id="close-detail-btn"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 rounded-full bg-white/5 border border-white/10 md:hidden pointer-events-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+
+                <div class="mb-3 sm:mb-4">
+                    <span
+                        class="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300 text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest mb-2 sm:mb-3">
+                        <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                        <span id="detail-category">ESTRUTURA BASE</span>
+                    </span>
+                    <h3 id="detail-title"
+                        class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight leading-none mt-1">
+                        Base do Pão Tostada</h3>
+                </div>
+
+                <div class="space-y-3 sm:space-y-4 text-xs sm:text-sm md:text-base">
+                    <div class="bg-white/5 p-4 sm:p-5 md:p-6 rounded-2xl border border-white/5">
+                        <h4
+                            class="text-[10px] sm:text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5 sm:mb-2 flex items-center gap-2">
+                            🔍 O QUE É
+                        </h4>
+                        <p id="detail-what"
+                            class="text-gray-200 leading-relaxed font-normal text-sm sm:text-base md:text-lg"></p>
+                    </div>
+                    <div class="bg-white/5 p-4 sm:p-5 md:p-6 rounded-2xl border border-white/5">
+                        <h4
+                            class="text-[10px] sm:text-[11px] font-semibold text-gray-300 uppercase tracking-widest mb-1.5 sm:mb-2 flex items-center gap-2">
+                            🔥 COMO FOI FEITO
+                        </h4>
+                        <p id="detail-how"
+                            class="text-gray-300 leading-relaxed font-normal text-xs sm:text-sm md:text-base"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- 🧀 PRÓXIMA SEÇÃO GOURMET - CHEDDAR MELT ORGANIC PINNED STAGE -->
+    <section id="proxima-secao" class="relative w-full h-[100dvh] bg-[#000000] text-white flex flex-col items-center justify-center px-6 border-t border-red-600/60 z-20 overflow-hidden">
+        
+        <!-- 🧀 DIVISÓRIA VETORIAL 2D DE CHEDDAR DERRETIDO ULTRA-ORGANICO COM BÉZIERS E GOTAS PINGANDO -->
+        <div id="cheddar-section-divider" class="absolute top-0 left-0 w-full h-full z-10 pointer-events-none overflow-visible origin-top">
+            <svg viewBox="0 0 1440 1050" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto block preserve-3d">
+                <defs>
+                    <!-- Gradiente de Cheddar Melt Suculento -->
+                    <linearGradient id="cheddarSectionGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#FFC107" />
+                        <stop offset="35%" stop-color="#FF9800" />
+                        <stop offset="70%" stop-color="#F57C00" />
+                        <stop offset="100%" stop-color="#E65100" />
+                    </linearGradient>
+
+                    <!-- Gradiente de Reflexo de Luz Curvo -->
+                    <linearGradient id="cheddarSectionGloss" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#FFF3C4" stop-opacity="0.95" />
+                        <stop offset="40%" stop-color="#FFE082" stop-opacity="0.6" />
+                        <stop offset="100%" stop-color="#FFB703" stop-opacity="0" />
+                    </linearGradient>
+
+                    <!-- Sombra Projetada Fluida 3D -->
+                    <filter id="cheddarSectionShadow" x="-10%" y="-10%" width="120%" height="180%">
+                        <feDropShadow dx="0" dy="24" stdDeviation="18" flood-color="#000000" flood-opacity="0.9" />
+                    </filter>
+                </defs>
+
+                <!-- 🧀 CURVAS ASSIMÉTRICAS BÉZIER ORGANICAS DE CHEDDAR DERRETIDO (UM LADO DESCE MAIS QUE O OUTRO) -->
+                <path id="cheddar-divider-path" fill="url(#cheddarSectionGrad)" filter="url(#cheddarSectionShadow)" d="
+                    M 0,0 
+                    L 1440,0 
+                    L 1440,40 
+                    C 1390,45 1360,110 1330,170 
+                    C 1290,250 1260,380 1220,440 
+                    C 1180,500 1140,510 1110,430 
+                    C 1070,330 1050,90 1010,90 
+                    C 970,90 940,320 900,580 
+                    C 860,820 810,980 760,980 
+                    C 710,980 670,720 640,450 
+                    C 610,180 580,80 540,80 
+                    C 500,80 470,210 430,340 
+                    C 390,470 350,560 310,560 
+                    C 270,560 250,380 220,220 
+                    C 190,60 160,50 120,50 
+                    C 80,50 40,180 20,290 
+                    C 10,340 0,320 0,40 Z
+                " />
+
+                <!-- 🧀 GOTAS DE QUEIJO PINGANDO EM TEARDROP 2D REALISTA -->
+                <g id="cheddar-dripping-drops">
+                    <!-- Gota 1 abaixo do fluxo principal longo (X=760) -->
+                    <path class="cheddar-drop-1" fill="url(#cheddarSectionGrad)" filter="url(#cheddarSectionShadow)" 
+                          d="M 760,990 C 772,990 780,1005 780,1018 C 780,1030 771,1040 760,1040 C 749,1040 740,1030 740,1018 C 740,1005 748,990 760,990 Z" />
+                    
+                    <!-- Gota 2 abaixo da gota esquerda (X=310) -->
+                    <path class="cheddar-drop-2" fill="url(#cheddarSectionGrad)" filter="url(#cheddarSectionShadow)" 
+                          d="M 310,570 C 320,570 327,582 327,593 C 327,603 319,610 310,610 C 301,610 293,603 293,593 C 293,582 300,570 310,570 Z" />
+
+                    <!-- Gota 3 abaixo da gota direita (X=1220) -->
+                    <path class="cheddar-drop-3" fill="url(#cheddarSectionGrad)" filter="url(#cheddarSectionShadow)" 
+                          d="M 1220,450 C 1229,450 1236,460 1236,470 C 1236,479 1229,486 1220,486 C 1211,486 1204,479 1204,470 C 1204,460 1211,450 1220,450 Z" />
+                </g>
+
+                <!-- Reflexo de Luz 2D Vetorial no topo da Linha -->
+                <path fill="url(#cheddarSectionGloss)" d="
+                    M 0,0 
+                    L 1440,0 
+                    L 1440,16 
+                    C 1370,26 1300,34 1220,34 
+                    C 1110,34 1030,44 920,44 
+                    C 810,44 730,28 640,28 
+                    C 530,28 440,38 330,38 
+                    C 220,38 130,26 0,0 Z
+                " />
+            </svg>
+        </div>
+
+        <!-- Conteúdo Imersivo da Seção Cheddar Melt com Transição de Revelação GSAP -->
+        <div id="cheddar-content-box" class="relative z-20 max-w-5xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-400 text-xs font-semibold uppercase tracking-widest mb-6">
+                🧀 Experiência Cheddar Melt Imersiva
+            </div>
+            <h2 class="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter text-center max-w-4xl mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white via-gray-100 to-gray-400">
+                O Derretimento Perfeito.
+            </h2>
+            <p class="text-base sm:text-xl text-gray-300 text-center max-w-2xl font-normal leading-relaxed mb-12 mx-auto">
+                Nossos queijos são selados no vapor de cerveja artesanal IPA para criar uma cortina de cremosidade inigualável que escorre e envolve todo o seu pedido.
+            </p>
+
+            <!-- Cards de Recursos Gourmet -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 text-left mb-12">
+                <div class="apple-minimal-card p-6 sm:p-8 rounded-3xl border border-white/10 bg-black/70 backdrop-blur-xl">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl mb-4 font-bold">12m</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Maturação Especial</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">Cheddar inglês envelhecido artesanalmente por 12 meses para o ponto ideal de acidez e derretimento.</p>
+                </div>
+                <div class="apple-minimal-card p-6 sm:p-8 rounded-3xl border border-white/10 bg-black/70 backdrop-blur-xl">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl mb-4 font-bold">IPA</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Vapor de Cerveja</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">Derretido no vapor de cerveja IPA artesanal, conferindo um toque de malte e aroma defumado único.</p>
+                </div>
+                <div class="apple-minimal-card p-6 sm:p-8 rounded-3xl border border-white/10 bg-black/70 backdrop-blur-xl">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl mb-4 font-bold">200°</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Textura Aveludada</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">Derretimento controlado a 200°C que mantém o brilho 2D e o sabor encorpado até a última mordida.</p>
+                </div>
+            </div>
+
+            <button class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-black font-bold px-10 py-4 rounded-full text-sm uppercase tracking-wider shadow-[0_0_50px_rgba(245,158,11,0.5)] transition-all transform hover:scale-105 cursor-pointer">
+                Pedir Cheddar Melt Agora
+            </button>
+        </div>
+    </section>
+
+    <!-- 🍔 SEÇÃO DE CARDÁPIO GOURMET SELECIONADO -->
+    <section id="sec-cardapio" class="relative w-full min-h-[100dvh] bg-[#050508] text-white flex flex-col items-center justify-center px-6 py-24 border-t border-white/5 z-20">
+        <div class="max-w-6xl mx-auto w-full">
+            <div class="text-center mb-16">
+                <span class="text-xs font-semibold uppercase tracking-widest text-gray-400 bg-white/5 px-4 py-1.5 rounded-full border border-white/10">Cardápio Premium</span>
+                <h2 class="text-4xl sm:text-6xl font-bold tracking-tighter mt-4">Nossas Criações Exclusivas.</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="apple-minimal-card p-8 rounded-3xl border border-white/10 bg-black/60 hover:border-white/30 transition-all">
+                    <div class="text-amber-400 text-xs font-bold uppercase tracking-widest mb-2">🔥 Mais Pedido</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Burger Pro Angus</h3>
+                    <p class="text-gray-400 text-sm mb-6 leading-relaxed">Blend 180g Angus, cheddar melt defumado, alface crespa, tomate confitado e molho especial no brioche tostado.</p>
+                    <div class="flex justify-between items-center pt-4 border-t border-white/10">
+                        <span class="text-2xl font-bold text-white">R$ 44,90</span>
+                        <button class="bg-white text-black font-semibold text-xs px-5 py-2.5 rounded-full uppercase tracking-wider hover:bg-gray-200 transition-colors">Adicionar</button>
+                    </div>
+                </div>
+                <div class="apple-minimal-card p-8 rounded-3xl border border-white/10 bg-black/60 hover:border-white/30 transition-all">
+                    <div class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">🧀 Duplo Cheddar</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Cheddar Lava Explosion</h3>
+                    <p class="text-gray-400 text-sm mb-6 leading-relaxed">Dois blends 150g Angus cobertos por uma avalanche de cheddar melt artesanal e farofa de bacon crocante.</p>
+                    <div class="flex justify-between items-center pt-4 border-t border-white/10">
+                        <span class="text-2xl font-bold text-white">R$ 52,90</span>
+                        <button class="bg-white text-black font-semibold text-xs px-5 py-2.5 rounded-full uppercase tracking-wider hover:bg-gray-200 transition-colors">Adicionar</button>
+                    </div>
+                </div>
+                <div class="apple-minimal-card p-8 rounded-3xl border border-white/10 bg-black/60 hover:border-white/30 transition-all">
+                    <div class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">🌿 Trufado Gourmet</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Truffle Brioche Special</h3>
+                    <p class="text-gray-400 text-sm mb-6 leading-relaxed">Blend Angus 180g, queijo gruyère derretido, maionese trufada com flor de sal e cebola caramelizada artesanal.</p>
+                    <div class="flex justify-between items-center pt-4 border-t border-white/10">
+                        <span class="text-2xl font-bold text-white">R$ 58,90</span>
+                        <button class="bg-white text-black font-semibold text-xs px-5 py-2.5 rounded-full uppercase tracking-wider hover:bg-gray-200 transition-colors">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ⭐️ SEÇÃO DE AVALIAÇÕES / DEPOIMENTOS DE CLIENTES -->
+    <section id="sec-depoimentos" class="relative w-full py-24 bg-black text-white border-t border-white/5 z-20">
+        <div class="max-w-5xl mx-auto px-6 text-center">
+            <span class="text-xs font-semibold uppercase tracking-widest text-amber-400">⭐️ 4.9 / 5.0 Avaliações</span>
+            <h2 class="text-3xl sm:text-5xl font-bold tracking-tighter mt-3 mb-12">Quem Prova, Apaixona.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                <div class="apple-minimal-card p-8 rounded-3xl border border-white/10 bg-white/5">
+                    <div class="text-amber-400 mb-4 text-lg">★★★★★</div>
+                    <p class="text-gray-300 text-base italic leading-relaxed mb-6">"O efeito do cheddar melt ao vivo é surreal, mas o sabor é ainda melhor! Pão brioche selado com perfection e a carne suculenta de verdade."</p>
+                    <div class="font-bold text-white text-sm">— Lucas Mendes, <span class="text-gray-400 font-normal">Chef & Gastrônomo</span></div>
+                </div>
+                <div class="apple-minimal-card p-8 rounded-3xl border border-white/10 bg-white/5">
+                    <div class="text-amber-400 mb-4 text-lg">★★★★★</div>
+                    <p class="text-gray-300 text-base italic leading-relaxed mb-6">"Melhor hambúrguer artesanal da cidade. O site já mostrava que a experiência seria diferenciada, e ao chegar o lanche quentinho superou tudo!"</p>
+                    <div class="font-bold text-white text-sm">— Mariana Siqueira, <span class="text-gray-400 font-normal">São Paulo - SP</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🖤 FOOTER MINIMALISTA APPLE STYLE -->
+    <footer id="sec-footer" class="relative w-full py-12 bg-black border-t border-white/10 text-gray-500 text-xs z-20">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-white font-bold tracking-widest uppercase text-sm">
+                BURGER<span class="text-gray-500">PRO</span>
+            </div>
+            <div class="flex gap-8 tracking-wider uppercase text-[11px]">
+                <a href="#hero" class="hover:text-white transition-colors">Início</a>
+                <a href="#explosion-stage" class="hover:text-white transition-colors">Montagem 3D</a>
+                <a href="#proxima-secao" class="hover:text-white transition-colors">Cheddar Melt</a>
+                <a href="#sec-cardapio" class="hover:text-white transition-colors">Cardápio</a>
+            </div>
+            <div>
+                © 2026 BURGERPRO Inc. Todos os direitos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // =========================================================================
+        // 🌌 EFEITO DE PARTÍCULAS MINIMALISTAS EM PROFUNDIDADE 3D (TOUCH & MOUSE)
+        // =========================================================================
+        const canvas = document.getElementById('antigravity-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        const particles = [];
+        const mouse = { x: -1000, y: -1000, active: false };
+        let activeHoveredLayer = null;
+
+        function updateCanvasSize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initParticles();
+        }
+
+        window.addEventListener('resize', updateCanvasSize);
+
+        // Eventos de Mouse e Touch para Android / iOS
+        function handlePointerMove(e) {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            mouse.x = clientX;
+            mouse.y = clientY;
+            mouse.active = true;
+        }
+
+        window.addEventListener('mousemove', handlePointerMove);
+        window.addEventListener('touchmove', handlePointerMove, { passive: true });
+
+        window.addEventListener('mouseleave', () => { mouse.active = false; });
+        window.addEventListener('touchend', () => { mouse.active = false; });
+
+        class DepthParticle {
+            constructor(x, y) {
+                this.baseX = x;
+                this.baseY = y;
+                this.x = x;
+                this.y = y;
+                this.vx = 0;
+                this.vy = 0;
+                
+                this.z = Math.random() * 1.8 + 0.3;
+                this.size = Math.random() * 1.8 * this.z + 0.6;
+                this.baseAlpha = (Math.random() * 0.3 + 0.1) * (this.z / 2);
+                this.alpha = this.baseAlpha;
+                
+                // 2 Cores Exclusivas Minimalistas: Branco Puro e Cinza Prata
+                const colors = [
+                    'rgba(255, 255, 255, ',  // 1. Branco Puro
+                    'rgba(160, 160, 175, '   // 2. Cinza Prata Minimalista
+                ];
+                this.colorBase = colors[Math.floor(Math.random() * colors.length)];
+                this.friction = 0.88;
+                this.ease = 0.035;
+                this.pulse = Math.random() * Math.PI * 2;
+                this.pulseSpeed = 0.015 + Math.random() * 0.015;
+            }
+
+            update(layerBoundingBoxes) {
+                this.pulse += this.pulseSpeed;
+                const floatY = Math.sin(this.pulse) * (2 * this.z);
+
+                // 1. Interação minimalista com o mouse / toque
+                if (mouse.active) {
+                    const dx = this.x - mouse.x;
+                    const dy = this.y - mouse.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const mouseRadius = width < 768 ? 160 : 220;
+
+                    if (dist < mouseRadius) {
+                        const force = (1 - dist / mouseRadius) * (12 * this.z);
+                        const angle = Math.atan2(dy, dx);
+                        this.vx += Math.cos(angle) * force * 0.45;
+                        this.vy += Math.sin(angle) * force * 0.45;
+                        this.alpha = Math.min(this.baseAlpha * 2.2, 0.8);
+                    } else {
+                        this.alpha += (this.baseAlpha - this.alpha) * 0.05;
+                    }
+                } else {
+                    this.alpha += (this.baseAlpha - this.alpha) * 0.05;
+                }
+
+                // 2. Deslocamento suave pelas peças do hambúrguer
+                if (layerBoundingBoxes && layerBoundingBoxes.length > 0) {
+                    for (let i = 0; i < layerBoundingBoxes.length; i++) {
+                        const box = layerBoundingBoxes[i];
+                        if (box.opacity < 0.05) continue;
+
+                        const layerCenterX = box.left + box.width / 2;
+                        const layerCenterY = box.top + box.height / 2;
+
+                        const dx = this.x - layerCenterX;
+                        const dy = this.y - layerCenterY;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const pushRadius = Math.max(box.width, box.height) * 0.6;
+
+                        if (dist < pushRadius) {
+                            const force = (1 - dist / pushRadius) * (20 * this.z);
+                            const angle = Math.atan2(dy, dx);
+
+                            this.vx += Math.cos(angle) * force * 0.75;
+                            this.vy += Math.sin(angle) * force * 0.75;
+                        }
+                    }
+                }
+
+                // 3. Explosão de profundidade ao focar um ingrediente
+                if (activeHoveredLayer) {
+                    const heroBox = activeHoveredLayer.getBoundingClientRect();
+                    const heroX = heroBox.left + heroBox.width / 2;
+                    const heroY = heroBox.top + heroBox.height / 2;
+
+                    const dx = this.x - heroX;
+                    const dy = this.y - heroY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const blastRadius = width < 768 ? 400 : 650;
+
+                    if (dist < blastRadius) {
+                        const blastForce = (1 - dist / blastRadius) * 25;
+                        const angle = Math.atan2(dy, dx);
+                        this.vx += Math.cos(angle) * blastForce * 0.65;
+                        this.vy += Math.sin(angle) * blastForce * 0.65;
+                    }
+                }
+
+                // Mola elástica de retorno
+                const targetX = this.baseX;
+                const targetY = this.baseY + floatY;
+
+                this.vx += (targetX - this.x) * this.ease;
+                this.vy += (targetY - this.y) * this.ease;
+
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.fillStyle = this.colorBase + this.alpha + ')';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function initParticles() {
+            particles.length = 0;
+            
+            // Densidade de partículas aumentada no celular (32px no mobile vs 48px no desktop)
+            const density = width < 768 ? 32 : 48;
+            const columns = Math.floor(width / density);
+            const rows = Math.floor(height / density);
+
+            for (let i = 0; i < columns; i++) {
+                for (let j = 0; j < rows; j++) {
+                    const x = (i + 0.5) * (width / columns) + (Math.random() - 0.5) * 25;
+                    const y = (j + 0.5) * (height / rows) + (Math.random() - 0.5) * 25;
+                    particles.push(new DepthParticle(x, y));
+                }
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+
+            const layerNodes = document.querySelectorAll('.burger-layer:not(#layer-full-burger)');
+            const boxes = [];
+            layerNodes.forEach(node => {
+                const rect = node.getBoundingClientRect();
+                const opacity = parseFloat(window.getComputedStyle(node).opacity || 1);
+                boxes.push({ left: rect.left, top: rect.top, width: rect.width, height: rect.height, opacity: opacity });
+            });
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update(boxes);
+                particles[i].draw();
+            }
+
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+
+        // =========================================================================
+        // 🚀 GSAP SCROLLTRIGGER & PAINÉIS DE CONFIGURAÇÃO (DESKTOP & MOBILE)
+        // =========================================================================
+        gsap.registerPlugin(ScrollTrigger);
+
+        // ⚙️ PAINEL DE CONFIGURAÇÃO DOS INGREDIENTES PARA DESKTOP (COMPUTADORES / NOTEBOOKS)
+        const BURGER_CONFIG = {
+            "layer-top-bun":        { x: 20,  y: -300, rotateZ: 0, scale: 1.1 }, // 1. Pão de Cima
+            "layer-top-lettuce":    { x: 20,  y: -200, rotateZ: 0, scale: 1.0 }, // 2. Alface Topo
+            "layer-tomato":         { x: 30,  y: -110, rotateZ: 0, scale: 1.2 }, // 3. Tomate Confitado
+            "layer-cheese":         { x: 28,  y: -20,  rotateZ: 0, scale: 1.1 }, // 4. Queijo Cheddar
+            "layer-meat":           { x: 30,  y: 70,   rotateZ: 0, scale: 1.1 }, // 5. Carne Angus
+            "layer-bottom-lettuce": { x: -35, y: 175,  rotateZ: 0, scale: 1.0 }, // 6. Alface Baixo
+            "layer-bottom-bun":     { x: 0,   y: 290,  rotateZ: 0, scale: 1.0 }  // 7. Pão de Baixo
+        };
+
+        // 📱 PAINEL DE CONFIGURAÇÃO DOS INGREDIENTES EXCLUSIVO PARA CELULAR (ANDROID / IOS)
+        const MOBILE_BURGER_CONFIG = {
+            "layer-top-bun":        { x: 5,   y: -190, rotateZ: 0, scale: 2.1 }, // 1. Pão de Cima
+            "layer-top-lettuce":    { x: 5,   y: -100, rotateZ: 0, scale: 2.0 }, // 2. Alface Topo
+            "layer-tomato":         { x: 5,   y: -30,  rotateZ: 0, scale: 2.0 }, // 3. Tomate Confitado
+            "layer-cheese":         { x: 5,   y: 30,   rotateZ: 0, scale: 2.0 }, // 4. Queijo Cheddar
+            "layer-meat":           { x: 5,   y: 100,  rotateZ: 0, scale: 2.0 }, // 5. Carne Angus
+            "layer-bottom-lettuce": { x: -35, y: 190,  rotateZ: 0, scale: 1.8 }, // 6. Alface Baixo
+            "layer-bottom-bun":     { x: -15, y: 280,  rotateZ: 0, scale: 2.0 }  // 7. Pão de Baixo
+        };
+
+        // Função para ler a configuração correta de acordo com a largura da tela
+        function getResponsiveConfig(id) {
+            const isMobile = window.innerWidth < 768;
+            return isMobile ? MOBILE_BURGER_CONFIG[id] : BURGER_CONFIG[id];
+        }
+
+        // Centralização exata de todas as camadas no ponto médio do container
+        gsap.set(".burger-layer", { xPercent: -50, yPercent: -50, transformOrigin: "center center" });
+        gsap.set(".burger-container", { xPercent: -50, yPercent: -50, transformStyle: "preserve-3d" });
+
+        // 1. CONFIGURAÇÃO INICIAL DAS 7 CAMADAS FORA DA TELA NO EIXO X (ZIG-ZAG)
+        function initLayerPositions() {
+            gsap.set("#layer-top-bun", { yPercent: -50, y: getResponsiveConfig("layer-top-bun").y, x: "100vw", opacity: 0, rotateZ: 6, filter: "blur(14px)" });
+            gsap.set("#layer-top-lettuce", { yPercent: -50, y: getResponsiveConfig("layer-top-lettuce").y, x: "-100vw", opacity: 0, rotateZ: -6, filter: "blur(14px)" });
+            gsap.set("#layer-tomato", { yPercent: -50, y: getResponsiveConfig("layer-tomato").y, x: "100vw", opacity: 0, rotateZ: 5, filter: "blur(14px)" });
+            gsap.set("#layer-cheese", { yPercent: -50, y: getResponsiveConfig("layer-cheese").y, x: "-100vw", opacity: 0, rotateZ: -5, filter: "blur(14px)" });
+            gsap.set("#layer-meat", { yPercent: -50, y: getResponsiveConfig("layer-meat").y, x: "100vw", opacity: 0, rotateZ: 4, filter: "blur(14px)" });
+            gsap.set("#layer-bottom-lettuce", { yPercent: -50, y: getResponsiveConfig("layer-bottom-lettuce").y, x: "-100vw", opacity: 0, rotateZ: 0, filter: "blur(14px)" });
+            gsap.set("#layer-bottom-bun", { yPercent: -50, y: getResponsiveConfig("layer-bottom-bun").y, x: "100vw", opacity: 0, rotateZ: 3, filter: "blur(14px)" });
+
+            // Posição inicial da Divisória de Cheddar Derretido 2D (No topo da linha vermelha da próxima seção)
+            gsap.set("#cheddar-section-divider", {
+                scaleY: 0.02,
+                scaleX: 1.0,
+                opacity: 0,
+                transformOrigin: "top center"
+            });
+        }
+
+        initLayerPositions();
+
+        // Hambúrguer completo inicialmente invisível
+        gsap.set("#layer-full-burger", { opacity: 0, scale: 1 });
+
+        // 🔒 DESATIVA EVENTOS DE MOUSE NAS CAMADAS DURANTE A ANIMAÇÃO INICIAL (POINTER-EVENTS: NONE)
+        const ingredientLayers = document.querySelectorAll('.burger-layer:not(#layer-full-burger)');
+        gsap.set(ingredientLayers, { pointerEvents: "none" });
+
+        // 🚀 TIMELINE PRINCIPAL DA ETAPA DO HAMBÚRGUER (PÁGINA 1)
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: "#explosion-stage",
+                start: "top top",
+                end: "+=3200",
+                scrub: 1.0,
+                pin: true,
+                anticipatePin: 1,
+                onUpdate: (self) => {
+                    const isAssembled = self.progress >= 0.88;
+                    gsap.set(ingredientLayers, { pointerEvents: isAssembled ? "auto" : "none" });
+
+                    if (isHoveringPiece && self.progress < 0.88) {
+                        resetFocusState();
+                    }
+                }
+            }
+        });
+
+        // 🚀 ENTRADA INTERCALADA ZIG-ZAG DAS PEÇAS DO HAMBÚRGUER
+        tl.to("#layer-bottom-bun", { x: getResponsiveConfig("layer-bottom-bun").x, opacity: 1, rotateZ: getResponsiveConfig("layer-bottom-bun").rotateZ, scale: getResponsiveConfig("layer-bottom-bun").scale, filter: "blur(0px)", ease: "power2.out", duration: 0.3 }, 0.0);
+        tl.to("#layer-bottom-lettuce", { x: getResponsiveConfig("layer-bottom-lettuce").x, opacity: 1, rotateZ: getResponsiveConfig("layer-bottom-lettuce").rotateZ, scale: getResponsiveConfig("layer-bottom-lettuce").scale, filter: "blur(0px)", ease: "power2.out", duration: 0.3 }, 0.12);
+        tl.to("#layer-meat", { x: getResponsiveConfig("layer-meat").x, opacity: 1, rotateZ: getResponsiveConfig("layer-meat").rotateZ, scale: getResponsiveConfig("layer-meat").scale, filter: "blur(0px)", ease: "power2.out", duration: 0.3 }, 0.24);
+        tl.to("#layer-cheese", { x: getResponsiveConfig("layer-cheese").x, opacity: 1, rotateZ: getResponsiveConfig("layer-cheese").rotateZ, scale: getResponsiveConfig("layer-cheese").scale, filter: "blur(0px)", ease: "power2.out", duration: 0.3 }, 0.36);
+        tl.to("#layer-tomato", { x: getResponsiveConfig("layer-tomato").x, opacity: 1, rotateZ: getResponsiveConfig("layer-tomato").rotateZ, scale: getResponsiveConfig("layer-tomato").scale, filter: "blur(0px)", ease: "power2.out", duration: 0.3 }, 0.48);
+        tl.to("#layer-top-lettuce", { x: getResponsiveConfig("layer-top-lettuce").x, opacity: 1, rotateZ: getResponsiveConfig("layer-top-lettuce").rotateZ, scale: getResponsiveConfig("layer-top-lettuce").scale, filter: "blur(0px)", ease: "power2.out", duration: 0.3 }, 0.60);
+        tl.to("#layer-top-bun", { x: getResponsiveConfig("layer-top-bun").x, opacity: 1, rotateZ: getResponsiveConfig("layer-top-bun").rotateZ, scale: getResponsiveConfig("layer-top-bun").scale, filter: "blur(0px)", ease: "power2.out", duration: 0.3 }, 0.72);
+
+
+        // =========================================================================
+        // 🧀 SCROLLTRIGGER PINNED PARA A PÁGINA DO CHEDDAR MELT (#proxima-secao)
+        // Estabiliza a tela em PIN enquanto o queijo derrete com curvas orgânicas e gotas caindo
+        // =========================================================================
+        const cheddarTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: "#proxima-secao",
+                start: "top top",
+                end: "+=2600",
+                scrub: 1.2,
+                pin: true,
+                anticipatePin: 1,
+            }
+        });
+
+        // 1. O queijo nasce na linha e escorre em curva assimétrica fluida
+        cheddarTl.fromTo("#cheddar-section-divider", 
+            { scaleY: 0.02, scaleX: 1.0, opacity: 0 },
+            { scaleY: 1.65, scaleX: 1.15, opacity: 1, ease: "power1.inOut", duration: 0.5 },
+            0.0
+        );
+
+        // 2. Gotas de queijo em teardrop despendendo-se e pingando com gravidade acelerada
+        cheddarTl.fromTo(".cheddar-drop-1", 
+            { y: 0, scale: 0.5, opacity: 0 }, 
+            { y: 380, scale: 1.3, opacity: 1, ease: "power2.in", duration: 0.4 }, 
+            0.2
+        );
+
+        cheddarTl.fromTo(".cheddar-drop-2", 
+            { y: 0, scale: 0.5, opacity: 0 }, 
+            { y: 420, scale: 1.2, opacity: 1, ease: "power2.in", duration: 0.4 }, 
+            0.35
+        );
+
+        cheddarTl.fromTo(".cheddar-drop-3", 
+            { y: 0, scale: 0.5, opacity: 0 }, 
+            { y: 350, scale: 1.1, opacity: 1, ease: "power2.in", duration: 0.4 }, 
+            0.45
+        );
+
+        // 3. Revelação dos textos e elementos enquanto o scroll está travado no cheddar
+        cheddarTl.fromTo("#cheddar-content-box", 
+            { opacity: 0, y: 80 }, 
+            { opacity: 1, y: 0, ease: "power2.out", duration: 0.4 }, 
+            0.25
+        );
+
+
+        // =========================================================================
+        // 🍔 HOVER E TOQUE INTERATIVO (DESKTOP & MOBILE RESPONSIVE)
+        // =========================================================================
+        const detailCard = document.getElementById('hover-detail-card');
+        const hoverHalo = document.getElementById('hover-halo');
+        const detailCategory = document.getElementById('detail-category');
+        const detailTitle = document.getElementById('detail-title');
+        const detailWhat = document.getElementById('detail-what');
+        const detailHow = document.getElementById('detail-how');
+        const closeBtn = document.getElementById('close-detail-btn');
+
+        let isHoveringPiece = false;
+
+        function resetFocusState() {
+            if (!isHoveringPiece && !activeHoveredLayer) return;
+            isHoveringPiece = false;
+            activeHoveredLayer = null;
+
+            gsap.to(detailCard, { opacity: 0, scale: 0.95, duration: 0.3, overwrite: "auto" });
+            gsap.to(hoverHalo, { opacity: 0, scale: 0.75, duration: 0.35, overwrite: "auto" });
+
+            ingredientLayers.forEach((layer) => {
+                const originalZ = layer.getAttribute('data-z') || '10';
+                const targetCfg = getResponsiveConfig(layer.id);
+                gsap.to(layer, {
+                    scale: targetCfg.scale,
+                    x: targetCfg.x,
+                    opacity: 1,
+                    filter: "none",
+                    duration: 0.38,
+                    overwrite: "auto",
+                    ease: "power2.out",
+                    onComplete: () => { layer.style.zIndex = originalZ; }
+                });
+                layer.style.zIndex = originalZ;
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                resetFocusState();
+            });
+        }
+
+        ingredientLayers.forEach((layer) => {
+            if (!layer.hasAttribute('data-z')) {
+                layer.setAttribute('data-z', layer.style.zIndex || '10');
+            }
+
+            function activateItemFocus(e, isExplicitClick = false) {
+                if (tl.progress() < 0.88) return;
+
+                const isMobile = window.innerWidth < 768;
+
+                // Se for um clique explícito e a peça JÁ estiver em foco, alterna fechando
+                if (isExplicitClick && activeHoveredLayer === layer && isHoveringPiece) {
+                    resetFocusState();
+                    return;
+                }
+
+                // Se já estiver focada e não for novo clique, ignora
+                if (activeHoveredLayer === layer && isHoveringPiece) return;
+
+                isHoveringPiece = true;
+                activeHoveredLayer = layer;
+
+                const currentZ = layer.style.zIndex || layer.getAttribute('data-z') || '10';
+                layer.setAttribute('data-z', currentZ);
+                layer.style.zIndex = '100';
+
+                gsap.to("#burger-container", { rotateX: 0, rotateY: 0, duration: 0.35, overwrite: "auto", ease: "power2.out" });
+
+                // 1. ANIMAÇÃO DE DESTAQUE RESPONSIVA (DESKTOP: SPLIT-SCREEN ESQUERDA | MOBILE: CENTRO E ESCALA COMPACTA)
+                const targetX = isMobile ? 0 : -360;
+                const targetScale = isMobile ? (MOBILE_BURGER_CONFIG[layer.id]?.scale || 1.8) : 2.6;
+
+                gsap.to(layer, {
+                    scale: targetScale,
+                    x: targetX,
+                    filter: "drop-shadow(0 30px 45px rgba(0, 0, 0, 0.95)) brightness(1.18)",
+                    duration: 0.4,
+                    overwrite: "auto",
+                    ease: "power3.out"
+                });
+
+                // 2. DEPTH OF FIELD (DoF): Blur e fade nas outras peças
+                ingredientLayers.forEach((other) => {
+                    if (other !== layer) {
+                        gsap.to(other, {
+                            opacity: isMobile ? 0.08 : 0.15,
+                            scale: 0.85,
+                            filter: "blur(4px)",
+                            duration: 0.4,
+                            overwrite: "auto",
+                            ease: "power3.out"
+                        });
+                    }
+                });
+
+                // 3. Halo de iluminação monocromática
+                gsap.to(hoverHalo, {
+                    opacity: 1,
+                    scale: isMobile ? 0.8 : 1.15,
+                    duration: 0.4,
+                    overwrite: "auto",
+                    ease: "power2.out"
+                });
+
+                // 4. Preenche e abre a Aba / Bottom Sheet de Especificações
+                detailCategory.textContent = layer.getAttribute('data-category');
+                detailTitle.textContent = layer.getAttribute('data-title');
+                detailWhat.textContent = layer.getAttribute('data-what');
+                detailHow.textContent = layer.getAttribute('data-how');
+
+                gsap.to(detailCard, {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.4,
+                    overwrite: "auto",
+                    ease: "power3.out"
+                });
+            }
+
+            // No desktop: mouseenter ativa o hover. No mobile: desativado para não conflitar com o clique tátil!
+            layer.addEventListener('mouseenter', (e) => {
+                if (window.innerWidth < 768) return;
+                activateItemFocus(e, false);
+            });
+
+            // Clique / Toque direto (funciona instantaneamente com 1 ÚNICO CLIQUE no celular e desktop)
+            layer.addEventListener('click', (e) => {
+                e.stopPropagation();
+                activateItemFocus(e, true);
+            });
+
+            layer.addEventListener('mouseleave', () => {
+                const isMobile = window.innerWidth < 768;
+                // No mobile, o toque mantém o card aberto até o usuário fechar ou tocar fora
+                if (!isMobile) {
+                    resetFocusState();
+                }
+            });
+        });
+
+    </script>
+</body>
+
+</html>
