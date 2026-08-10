@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code — Mar & Sol</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Mulish:wght@500;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Mulish', sans-serif;
+      background: #1B1815;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #241F1A;
+      border-radius: 28px;
+      padding: 48px 56px;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0,0,0,.6);
+      border: 2px solid #3a2f22;
+      max-width: 440px;
+      width: 90vw;
+      animation: fadeUp .6s cubic-bezier(.2,1.4,.4,1) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      font-family: 'Baloo 2', cursive;
+      font-size: 2rem;
+      color: #FFC845;
+      margin-bottom: 6px;
+    }
+
+    .sub {
+      font-size: .9rem;
+      color: #8a8078;
+      margin-bottom: 32px;
+    }
+
+    #qr {
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      display: inline-block;
+      margin-bottom: 28px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    }
+
+    .url-box {
+      background: #1B1815;
+      border: 1px solid #3a2f22;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: .95rem;
+      color: #FFC845;
+      font-weight: 700;
+      word-break: break-all;
+      margin-bottom: 24px;
+    }
+
+    .hint {
+      font-size: .82rem;
+      color: #8a8078;
+      line-height: 1.6;
+    }
+
+    .hint strong {
+      color: #FFE9C7;
+    }
+
+    .pulse {
+      display: inline-block;
+      width: 10px; height: 10px;
+      background: #4ade80;
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .4; transform: scale(.7); }
+    }
+
+    .status {
+      font-size: .85rem;
+      color: #4ade80;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Mar &amp; Sol</div>
+    <div class="sub">Escaneie para abrir no iPhone</div>
+
+    <div class="status">
+      <span class="pulse"></span>
+      Servidor ativo na rede local
+    </div>
+
+    <div id="qr"></div>
+
+    <div class="url-box" id="urlDisplay">http://192.168.3.65:8080/index_6.html</div>
+
+    <div class="hint">
+      📱 Abra a <strong>câmera</strong> do iPhone e aponte para o QR Code<br>
+      ou acesse a URL acima no <strong>Safari</strong><br><br>
+      💡 Dica: no Safari toque em <strong>Compartilhar → Adicionar à Tela de Início</strong><br>
+      para instalar como app!
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script>
+    const url = "http://192.168.3.65:8080/index_6.html";
+    document.getElementById('urlDisplay').textContent = url;
+
+    new QRCode(document.getElementById("qr"), {
+      text: url,
+      width: 220,
+      height: 220,
+      colorDark: "#1B1815",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  </script>
+</body>
+</html>
